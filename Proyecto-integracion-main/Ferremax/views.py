@@ -6,6 +6,7 @@ from .models import marca, categoria, proveedor, producto, cargo, empleado, usua
 from .apiMonedas import dolar, euro
 import requests
 import json
+from django.contrib.auth import logout
 
 from django.conf import settings
 from django.http import JsonResponse
@@ -33,37 +34,43 @@ def Contacto(request):
 
 
 def crud_cuentas(request):
-    if request.method != "POST":
-        carg = cargo.objects.all()
+    if request.method == "POST":
+        Pnom = request.POST["txtPrimer_nombre_Empleado"]
+        Snom = request.POST["txtSegundo_nombre_Empleado"]
+        Papp = request.POST["txtPrimer_Apellido"]
+        Sapp = request.POST["txtSegundo_Apellido"]
+        Dir = request.POST["txtDireccion"]
+        Age = request.POST["txtEdad"]
+        IdCar = request.POST["cargo"]
 
-        context = {
-            "cargo": carg,
-        }
-        return render(request, "core/crud_cuentas.html", context)
-    else:
-        p_nombre_empleado = request.POST["txtPrimer_nombre_Empleado"]
-        s_nombre_empleado = request.POST["txtSegundo_nombre_Empleado"]
-        p_apellido_empleado = request.POST["txtPrimer_Apellido"]
-        s_apellido_empleado = request.POST["txtSegundo_Apellido"]
-        direccion_empleado = request.POST["txtDireccion"]
-        edad_empleado = request.POST["txtEdad"]
-        id_cargo = request.POST["cargo"]
+        objCar = cargo.objects.get(idCargo=IdCar)
 
-        objCargo = cargo.objects.get(idCargo=id_cargo)
-
-        emp = empleado.objects.create(
-            pNombreEmpleado=p_nombre_empleado,
-            sNombreEmpleado=s_nombre_empleado,
-            pApellidoEmpleado=p_apellido_empleado,
-            sApellidoEmpleado=s_apellido_empleado,
-            direccionEmpleado=direccion_empleado,
-            edad=edad_empleado,
-            cargo=objCargo,
+        Emp = empleado.objects.create(
+            pNombreEmpleado=Pnom,
+            sNombreEmpleado=Snom,
+            pApellidoEmpleado=Papp,
+            sApellidoEmpleado=Sapp,
+            direccionEmpleado=Dir,
+            edad=Age,
+            cargo=objCar,
         )
-        emp.save()
 
-        context = {"mensaje": "Exito"}
-        return render(request, "core/resultado.html", context)
+        Emp.save()
+        return redirect("crud_cuentas")  # Redirigir a la misma vista después de guardar
+
+    else:
+        Car = cargo.objects.all()
+        Empleados = empleado.objects.all()
+
+        context = {"Cargo": Car, "cuenta": Empleados}
+        return render(request, "core/crud_cuentas.html", context)
+
+
+def EliminarCuenta(request, pk):
+    Emp = empleado.objects.get(idEmpleado=pk)
+    Emp.delete()
+
+    return redirect("crud_cuentas")
 
 
 def crud_productos(request):
@@ -102,8 +109,7 @@ def crud_productos(request):
         )
         cli.save()
 
-        context = {"mensaje": "Exito"}
-        return render(request, "core/resultado.html", context)
+        return render(request, "core/crud_Productos.html", context)
 
 
 def resultado(request):
@@ -296,6 +302,11 @@ def edicion_producto(request, pk):
         prod.save()
 
         return redirect("crud_productos")
+
+
+def Logout(request):
+    del request.session["nombreUsuario"]
+    return redirect("Login")
 
 
 def IndexEmpleados(request):

@@ -17,7 +17,9 @@ from .views import (
     registro,
     eliminarProducto,
     edicion_producto,
+    EliminarCuenta,
     IndexEmpleados,
+    Logout,
 )
 
 """ router = routers.DefaultRouter()
@@ -39,6 +41,7 @@ urlpatterns = [
     path("IndexEmpleados", IndexEmpleados, name="IndexEmpleados"),
     path("edicion_producto/<str:pk>", edicion_producto, name="edicion_producto"),
     path("eliminarProducto/<str:pk>", eliminarProducto, name="eliminarProducto"),
+    path("EliminarCuenta/<str:pk>", EliminarCuenta, name="EliminarCuenta"),
     path("api/v1/productos/", ProductoListView.as_view(), name="apiProductos"),
     path(
         "api/v1/productos/<int:pk>/",
@@ -50,4 +53,5 @@ urlpatterns = [
         ProductoUpdateView.as_view(),
         name="apiProductosUpdate",
     ),
+    path("Logout", Logout, name="Logout"),
 ]
